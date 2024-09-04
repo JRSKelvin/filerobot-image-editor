@@ -91,7 +91,7 @@ const CanvasNode = ({ children }) => {
       e.evt.preventDefault();
       e.currentTarget.container?.().focus();
 
-      if (e.target instanceof Konva.Stage && selectionsIds.length > 0) {
+      if (selectionsIds.length > 0) {
         dispatch({
           type: CLEAR_ANNOTATIONS_SELECTIONS,
         });
