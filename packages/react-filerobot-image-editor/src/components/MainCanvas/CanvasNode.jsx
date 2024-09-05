@@ -90,8 +90,12 @@ const CanvasNode = ({ children }) => {
     (e) => {
       e.evt.preventDefault();
       e.currentTarget.container?.().focus();
+      /*
+      console.log('Clear Selection Canvas', e.target, selectionsIds.length, e.target.constructor.name, selectionsIds.length > 0);
+      */
 
-      if (e.target instanceof Konva.Stage && selectionsIds.length > 0) {
+      if (e.target.constructor.name === 'Stage' && selectionsIds.length > 0) {
+        console.log('Clear Selection Canvas Successfully');
         dispatch({
           type: CLEAR_ANNOTATIONS_SELECTIONS,
         });
