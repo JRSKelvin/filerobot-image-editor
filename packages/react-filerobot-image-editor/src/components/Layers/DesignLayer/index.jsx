@@ -32,6 +32,7 @@ const DesignLayer = () => {
     finetunesProps = {},
     filter = null,
     adjustments: { rotation = 0, crop = {}, isFlippedX, isFlippedY } = {},
+    config: { onClickImagePosition },
     resize,
   } = useStore();
   const imageNodeRef = useRef();
@@ -264,6 +265,21 @@ const DesignLayer = () => {
       scaleY={finalScaleY}
       rotation={isCurrentlyCropping ? 0 : rotation}
       clipFunc={clipFunc}
+      onClick={(e) => {
+        const stage = e.target.getStage();
+        const imageNode = imageNodeRef.current;
+        const imagePos = imageNode.getClientRect();
+        const { x: clickX, y: clickY } = stage.getPointerPosition();
+        const relativeX = (clickX - imagePos.x) / imagePos.width;
+        const relativeY = (clickY - imagePos.y) / imagePos.height;
+        const percentageX = Math.max(0, Math.min(100, relativeX * 100));
+        const percentageY = Math.max(0, Math.min(100, relativeY * 100));
+        const onClickImagePositionFn = onClickImagePosition;
+        // console.log(`X: ${percentageX}% And Y: ${percentageY}%`);
+        if (typeof onClickImagePositionFn === 'function') {
+          onClickImagePositionFn(percentageX, percentageY);
+        }
+      }}
     >
       <Image
         id={IMAGE_NODE_ID}
@@ -274,7 +290,6 @@ const DesignLayer = () => {
         offsetY={scaledSpacedOriginalImg.height / 2}
         x={scaledSpacedOriginalImg.width / 2}
         y={scaledSpacedOriginalImg.height / 2}
-        listening={false}
         filters={finetunesAndFilter}
         ref={imageNodeRef}
         {...finetunesProps}

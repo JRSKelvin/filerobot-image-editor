@@ -326,6 +326,8 @@ const config = {
   //   console.log('CYA👋🏼👋🏼👋🏼');
   //   uriDownload(savedImageData.imageBase64, savedImageData.fullName);
   // },
+  onClickImagePosition: () => {
+  },
   moreSaveOptions: [
     {
       label: '[optional] Save option 1',

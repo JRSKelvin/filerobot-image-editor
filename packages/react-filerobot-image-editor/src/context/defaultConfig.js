@@ -96,6 +96,7 @@ export default {
   defaultToolId: TOOLS_IDS.CROP,
   onClose: undefined,
   onSave: undefined,
+  onClickImagePosition: undefined,
   onBeforeSave: undefined,
   closeAfterSave: false,
   defaultSavedImageName: undefined,
