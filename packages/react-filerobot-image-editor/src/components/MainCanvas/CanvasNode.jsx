@@ -94,6 +94,17 @@ const CanvasNode = ({ children }) => {
       console.log('Clear Selection Canvas', e.target, selectionsIds.length, e.target.constructor.name, selectionsIds.length > 0);
       */
 
+      if (
+        e.target.constructor.name === 'Image' &&
+        selectionsIds.length > 0 &&
+        e.target.attrs.id === 'FIE_original-image'
+      ) {
+        console.log('Clear Selection Canvas Successfully');
+        dispatch({
+          type: CLEAR_ANNOTATIONS_SELECTIONS,
+        });
+      }
+
       if (e.target.constructor.name === 'Stage' && selectionsIds.length > 0) {
         console.log('Clear Selection Canvas Successfully');
         dispatch({

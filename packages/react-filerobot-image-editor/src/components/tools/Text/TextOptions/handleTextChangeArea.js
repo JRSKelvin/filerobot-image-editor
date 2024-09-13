@@ -73,7 +73,7 @@ const activateTextChange = (
   textarea.style.maxHeight = `${
     textNode.height() - textNode.padding() * 2 + 5
   }px`;
-  textarea.style.fontSize = `${textNode.fontSize()}px`;
+  textarea.style.fontSize = `${parseInt(textNode.fontSize(), 10) / 2}px`;
   textarea.style.border = '1px solid rgba(0, 0, 0, 0.5)';
   textarea.style.padding = '0px';
   textarea.style.margin = '0px';
