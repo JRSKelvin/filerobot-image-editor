@@ -53,6 +53,9 @@ const activateTextChange = (
   textNode.hide();
   transformer.hide();
 
+  const firstAnchor = transformer.children[0];
+  const zoomLevel = canvasStage.scaleX();
+
   // at first lets find position of text node relative to the stage:
   const textPosition = textNode.absolutePosition();
 
@@ -65,15 +68,17 @@ const activateTextChange = (
   // and sometimes it is hard to make it 100% the same. But we will try...
   textarea.value = textNode.text();
   textarea.style.position = 'absolute';
-  textarea.style.top = `${textPosition.y}px`;
-  textarea.style.left = `${textPosition.x}px`;
-  textarea.style.width = `${textNode.width() - textNode.padding() * 2}px`;
-  textarea.style.height = `${textNode.height() - textNode.padding() * 2 + 5}px`;
-  textarea.style.maxWidth = `${textNode.width() - textNode.padding() * 2}px`;
-  textarea.style.maxHeight = `${
-    textNode.height() - textNode.padding() * 2 + 5
-  }px`;
-  textarea.style.fontSize = `${parseInt(textNode.fontSize(), 10) / 2}px`;
+  textarea.style.top = `${textPosition.y + 16}px`;
+  textarea.style.left = `${textPosition.x + 16}px`;
+  // textarea.style.width = `${textNode.width() - textNode.padding() * 2}px`;
+  // textarea.style.height = `${textNode.height() - textNode.padding() * 2 + 5}px`;
+  textarea.style.width = `${firstAnchor.attrs.width}px`;
+  textarea.style.height = `${firstAnchor.attrs.height}px`;
+  // textarea.style.maxWidth = `${textNode.width() - textNode.padding() * 2}px`;
+  // textarea.style.maxHeight = `${
+  //   textNode.height() - textNode.padding() * 2 + 5
+  // }px`;
+  textarea.style.fontSize = `${parseInt(textNode.fontSize() * zoomLevel)}px`;
   textarea.style.border = '1px solid rgba(0, 0, 0, 0.5)';
   textarea.style.padding = '0px';
   textarea.style.margin = '0px';
@@ -105,11 +110,6 @@ const activateTextChange = (
   transform += `translateY(-${firefoxMovePx}px)`;
 
   textarea.style.transform = transform;
-
-  // reset height
-  textarea.style.height = 'auto';
-  // after browsers resized it we can set actual value
-  textarea.style.height = `${textarea.scrollHeight + 3}px`;
 
   textarea.focus();
 
@@ -146,15 +146,15 @@ const activateTextChange = (
     }
   });
 
-  textarea.addEventListener('keydown', (event) => {
-    if (event.key === 'Enter' || event.key === 'Escape') {
-      return;
-    }
-    const scale = textNode.getAbsoluteScale().x;
-    setTextareaWidth(textNode.width() * scale);
-    textarea.style.height = 'auto';
-    textarea.style.height = `${textarea.scrollHeight + textNode.fontSize()}px`;
-  });
+  // textarea.addEventListener('keydown', (event) => {
+  //   if (event.key === 'Enter' || event.key === 'Escape') {
+  //     return;
+  //   }
+  //   const scale = textNode.getAbsoluteScale().x;
+  //   setTextareaWidth(textNode.width() * scale);
+  //   textarea.style.height = 'auto';
+  //   textarea.style.height = `${textarea.scrollHeight + textNode.fontSize()}px`;
+  // });
 
   if (window) {
     setTimeout(() => {
