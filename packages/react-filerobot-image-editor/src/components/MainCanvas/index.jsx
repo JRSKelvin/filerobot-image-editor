@@ -31,7 +31,7 @@ const MainCanvas = () => {
   useEffect(() => {
     observeResize(canvasContainerRef.current, setNewCanvasSize);
   }, []);
-
+  
   return (
     <CanvasContainer className="FIE_canvas-container" ref={canvasContainerRef}>
       {!providedAppContext.textIdOfEditableContent && <NodeControls />}

@@ -37,6 +37,7 @@ export const TOOLS_IDS = {
   RECT: 'Rect',
   ELLIPSE: 'Ellipse',
   POLYGON: 'Polygon',
+  SELECT: 'Select',
   TEXT: 'Text',
   LINE: 'Line',
   IMAGE: 'Image',

@@ -16,6 +16,7 @@ import {
   CHANGE_POINTER_ICON,
   CLEAR_ANNOTATIONS_SELECTIONS,
   ZOOM_CANVAS,
+  SELECT_ANNOTATION,
 } from 'actions';
 import {
   DEFAULT_ZOOM_FACTOR,
@@ -40,6 +41,7 @@ const CanvasNode = ({ children }) => {
     canvasWidth,
     canvasHeight,
     canvasScale,
+    annotations = {},
     selectionsIds = [],
     zoom = {},
     config: { previewPixelRatio, disableZooming },
@@ -52,6 +54,16 @@ const CanvasNode = ({ children }) => {
       tabId !== TABS_IDS.WATERMARK &&
       zoom.factor > defaultZoomFactor,
   );
+  const [selectionRectangle, setSelectionRectangle] = useState(null);
+  const [selecting, setSelecting] = useState(false);
+  const [selectionBox, setSelectionBox] = useState({
+    visible: false,
+    x: 0,
+    y: 0,
+    width: 0,
+    height: 0,
+  });
+
 
   const cursorStyle = useMemo(
     () => ({
@@ -68,6 +80,184 @@ const CanvasNode = ({ children }) => {
       type: ZOOM_CANVAS,
       payload: newZoomProps,
     });
+  };
+
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === "Delete") {
+        // Find the div with class 'FIE_annotation-controls-overlay'
+        const overlayDiv = document.querySelector('.FIE_annotation-controls-overlay');
+        
+        if (overlayDiv) {
+          // Find all buttons inside this div
+          const buttons = overlayDiv.querySelectorAll('button');
+          
+          if (buttons.length >= 2) {
+            // Click the second button
+            buttons[1].click();
+          }
+        }
+      }
+    };
+  
+    // Add event listener for 'keydown' event
+    document.addEventListener('keydown', handleKeyDown);
+  
+    // Clean up the event listener when the component is unmounted
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!canvasRef) {
+      return;
+    }
+
+    if (toolId !== "Select") {
+      return;
+    }
+
+    const stage = canvasRef.current;
+    const layers = stage.getLayers(); 
+    const layer = layers[0];
+
+    // Create a new selection rectangle
+    const newRect = new Konva.Rect({
+      fill: 'rgba(0,0,255,0.5)',
+      visible: false,
+      listening: false,
+      name: "highlight-rect"
+    });
+    layer.add(newRect);
+
+    setSelectionRectangle(newRect);
+  }, [canvasRef, toolId]);
+
+  const handleMouseDown = (e) => {
+    if (selectionRectangle && toolId === "Select") {
+      const stage = e.target.getStage();
+      // const pointerPosition = stage.getPointerPosition(); // Fix pointer position
+      const layers = stage.getLayers(); 
+      if (layers.length > 0) {
+        const layer = layers[0];
+        const pointerPosition = layer.getRelativePointerPosition();
+  
+        setSelectionBox({
+          visible: true,
+          x: pointerPosition.x,
+          y: pointerPosition.y,
+          width: 0,
+          height: 0,
+        });
+        setSelecting(true);
+        selectionRectangle.visible(true); // Show the rectangle
+        selectionRectangle.setAttrs({
+          x: pointerPosition.x,
+          y: pointerPosition.y,
+          width: 0,
+          height: 0,
+        });
+      }
+    }
+  };
+  
+  const handleMouseMove = (e) => {
+    if (!selecting) return;
+    e.evt.preventDefault();
+  
+    const stage = e.target.getStage();
+    const layers = stage.getLayers(); 
+    if (layers.length > 0) {
+      const layer = layers[0];
+      const pointerPosition = layer.getRelativePointerPosition();
+    
+      const newX = Math.min(selectionBox.x, pointerPosition.x);
+      const newY = Math.min(selectionBox.y, pointerPosition.y);
+      const newWidth = Math.abs(pointerPosition.x - selectionBox.x);
+      const newHeight = Math.abs(pointerPosition.y - selectionBox.y);
+    
+      // Update the rectangle position and size
+      selectionRectangle.setAttrs({
+        x: newX,
+        y: newY,
+        width: newWidth,
+        height: newHeight,
+      });
+    }
+  };
+  
+  const handleMouseUp = (e) => {
+    if (!selecting) return;
+      setSelecting(false);
+      selectionRectangle.visible(false); 
+      const { x, y, width, height } = selectionRectangle.attrs;
+  
+      const box = {
+        left: Math.min(x, x + width),
+        right: Math.max(x, x + width),
+        top: Math.min(y, y + height),
+        bottom: Math.max(y, y + height),
+      };
+
+      // // Update selected items
+      const selectedItems = Object.keys(annotations).map(key => {
+        const item = annotations[key];
+        const itemBox = {
+          left: item.x,
+          right: item.x + item.width,
+          top: item.y,
+          bottom: item.y + item.height,
+        };
+  
+        const isInside =
+          itemBox.right > box.left &&
+          itemBox.left < box.right &&
+          itemBox.bottom > box.top &&
+          itemBox.top < box.bottom;
+  
+        return { ...item, selected: isInside };
+      });
+
+      const stage = e.target.getStage();
+      const layers = stage.getLayers(); 
+      if (layers.length > 1) {
+        
+        const layerObject = layers[0];
+        const layerTF = layers[1].children[0];
+        const shapes = layerObject.children.filter(f => f.attrs.id !== "FIE_original-image" && f.attrs.name !== "highlight-rect");
+        const rectBox = selectionRectangle.getClientRect();
+        
+        const selected = shapes.filter((shape) =>
+          Konva.Util.haveIntersection(rectBox, shape.getClientRect())
+        );
+
+        selected.map((shape) => {
+          shape.draggable(true);
+
+          dispatch({
+            type: SELECT_ANNOTATION,
+            payload: {
+              annotationId: shape.attrs.id,
+              multiple: true,
+            },
+          });
+        });
+
+        layerTF.nodes(selected);
+
+        setTimeout(() => {
+          dispatch({ 
+            type: CHANGE_POINTER_ICON,
+            payload: {
+              pointerCssIcon: POINTER_ICONS.MOVE,
+            },
+          });
+        }, 1000)
+      }
+  
+      // setItems(updatedItems);
+      setSelectionBox({ startX: 0, startY: 0, width: 0, height: 0 });
   };
 
   const handleCanvasDragEnd = (e) => {
@@ -235,6 +425,9 @@ const CanvasNode = ({ children }) => {
       x={(isZoomEnabled && zoom.x) || null}
       y={(isZoomEnabled && zoom.y) || null}
       zoomFactor={(isZoomEnabled && zoom.factor) || defaultZoomFactor}
+      onMouseDown={handleMouseDown}
+      onMouseMove={handleMouseMove}
+      onMouseUp={handleMouseUp}
       onWheel={isZoomEnabled ? handleZoom : undefined}
       onTap={clearSelections}
       onClick={clearSelections}

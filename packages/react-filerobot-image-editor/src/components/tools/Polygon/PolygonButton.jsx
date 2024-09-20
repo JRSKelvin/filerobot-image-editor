@@ -1,7 +1,7 @@
 /** External Dependencies */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Polygon as PolygonIcon } from '@scaleflex/icons/polygon';
+import { Resize } from '@scaleflex/icons';
 
 /** Internal Dependencies */
 import ToolsBarItemButton from 'components/ToolsBar/ToolsBarItemButton';
@@ -10,9 +10,9 @@ import { TOOLS_IDS } from 'utils/constants';
 const PolygonButton = ({ selectTool, isSelected, t }) => (
   <ToolsBarItemButton
     className="FIE_polygon-tool-button"
-    id={TOOLS_IDS.POLYGON}
-    label={t('polygonTool')}
-    Icon={PolygonIcon}
+    id={TOOLS_IDS.SELECT}
+    label={"Select"}
+    Icon={Resize}
     onClick={selectTool}
     isSelected={isSelected}
   />
