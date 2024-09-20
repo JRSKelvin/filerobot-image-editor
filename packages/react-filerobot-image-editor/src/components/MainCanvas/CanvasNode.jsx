@@ -280,12 +280,10 @@ const CanvasNode = ({ children }) => {
     (e) => {
       e.evt.preventDefault();
       e.currentTarget.container?.().focus();
-      /*
-      console.log('Clear Selection Canvas', e.target, selectionsIds.length, e.target.constructor.name, selectionsIds.length > 0);
-      */
+      const prototype = Object.getPrototypeOf(e.target);
 
       if (
-        e.target.constructor.name === 'Image' &&
+        (e.target.constructor.name === 'Image' || prototype?.className === "Image") &&
         selectionsIds.length > 0 &&
         e.target.attrs.id === 'FIE_original-image'
       ) {
