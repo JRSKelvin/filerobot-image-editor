@@ -202,7 +202,7 @@ const CanvasNode = ({ children }) => {
     setTimeout(() => {
       setIsDrawing(false);
       setHasMoved(false); 
-    }, 250);
+    }, 100);
 
     if (!selecting) return;
       setSelecting(false);

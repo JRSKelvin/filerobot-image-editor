@@ -49,7 +49,7 @@ const useAnnotation = (annotation = {}, enablePreview = true) => {
       }, 30)();
     }
 
-    if (!annotationKeys.includes(savableAnnotationData.id)) {
+    if (!annotationKeys.includes(savableAnnotationData.id) && savableAnnotationData.name === "Text") {
       setTimeout(() => {
         dispatch({
           type: ENABLE_TEXT_CONTENT_EDIT,
@@ -136,7 +136,22 @@ const useAnnotation = (annotation = {}, enablePreview = true) => {
         id: shouldSave ? savableAnnotation.id : selection.id,
       }, annotations);
     }
-  }, [tmpAnnotation, annotations]);
+  }, [tmpAnnotation]);
+
+  // useEffect(() => {
+  //   console.log("DEBUG", selectionsIds)
+  //   const { shouldSave, neverSave, ...savableAnnotation } = tmpAnnotation;
+  //   if (savableAnnotation.name === "Text") {
+  //     const selection =
+  //       selectionsIds.length === 1 && annotations[selectionsIds[0]];
+  //     if (!neverSave && (shouldSave || selection)) {
+  //       saveAnnotation({
+  //         ...savableAnnotation,
+  //         id: shouldSave ? savableAnnotation.id : selection.id,
+  //       }, annotations);
+  //     }
+  //   }
+  // }, [tmpAnnotation, selectionsIds]);
 
   useEffect(() => {
     // setTimeout to make the state changes after the annotation is drawn not before.
