@@ -7,8 +7,8 @@ import Duplicate from '@scaleflex/icons/duplicate';
 
 /** Internal Dependencies */
 import { useStore } from 'hooks';
-import { DUPLICATE_ANNOTATIONS, REMOVE_ANNOTATIONS } from 'actions';
-import { NODES_TRANSFORMER_ID, WATERMARK_ANNOTATION_ID } from 'utils/constants';
+import { DUPLICATE_ANNOTATIONS, REMOVE_ANNOTATIONS, CHANGE_POINTER_ICON } from 'actions';
+import { NODES_TRANSFORMER_ID, WATERMARK_ANNOTATION_ID, POINTER_ICONS } from 'utils/constants';
 import debounce from 'utils/debounce';
 import { StyledNodeControls } from './NodeControls.styled';
 
@@ -58,6 +58,13 @@ const NodeControls = () => {
       type: REMOVE_ANNOTATIONS,
       payload: {
         annotationsIds: selectionsIds,
+      },
+    });
+
+    dispatch({
+      type: CHANGE_POINTER_ICON,
+      payload: {
+        pointerCssIcon: POINTER_ICONS['DRAW'],
       },
     });
   };

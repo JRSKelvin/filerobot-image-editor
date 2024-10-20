@@ -70,6 +70,9 @@ const ToolsBar = ({ isPhoneScreen }) => {
       const selectionsLength = selectionsIds.length;
       if (selectionsLength === 1) {
         const selectedAnnotation = annotations[selectionsIds[0]];
+        if (!selectedAnnotation) {
+          return null;
+        }
         return TOOLS_ITEMS[selectedAnnotation.name]?.ItemOptions;
       }
       if (selectionsLength > 1) {

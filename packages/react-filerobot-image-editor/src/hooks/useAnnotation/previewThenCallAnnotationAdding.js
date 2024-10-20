@@ -124,10 +124,12 @@ const previewThenCallAnnotationAdding = (
       updateAnnotationPreview(boundingRect, e.evt.shiftKey);
     } else {
       const { id, x, y, points, ...currentAnnotationProps } = annotation;
-      previewAnnotation({
-        ...currentAnnotationProps,
-        ...boundingRect,
-      });
+      if (currentAnnotationProps.name !== TOOLS_IDS.POLYGON && !e.evt.ctrlKey) {
+        previewAnnotation({
+          ...currentAnnotationProps,
+          ...boundingRect,
+        });
+      }
     }
 
     canvas.setAttrs({ isDrawing: true });

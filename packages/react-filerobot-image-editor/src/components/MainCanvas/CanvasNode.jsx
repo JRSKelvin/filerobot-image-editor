@@ -17,6 +17,7 @@ import {
   CLEAR_ANNOTATIONS_SELECTIONS,
   ZOOM_CANVAS,
   SELECT_ANNOTATION,
+  ENABLE_TEXT_CONTENT_EDIT
 } from 'actions';
 import {
   DEFAULT_ZOOM_FACTOR,
@@ -63,7 +64,10 @@ const CanvasNode = ({ children }) => {
     width: 0,
     height: 0,
   });
-
+  const [isDrawing, setIsDrawing] = useState(false);
+  const [isClick, setIsClick] = useState(false);
+  const [hasMoved, setHasMoved] = useState(false);
+  const [target, setTarget] = useState(null);
 
   const cursorStyle = useMemo(
     () => ({
@@ -114,7 +118,7 @@ const CanvasNode = ({ children }) => {
       return;
     }
 
-    if (toolId !== "Select") {
+    if (toolId !== "Polygon") {
       return;
     }
 
@@ -135,7 +139,10 @@ const CanvasNode = ({ children }) => {
   }, [canvasRef, toolId]);
 
   const handleMouseDown = (e) => {
-    if (selectionRectangle && toolId === "Select") {
+    setIsDrawing(true);
+    setHasMoved(false);
+
+    if (selectionRectangle && toolId === "Polygon") {
       const stage = e.target.getStage();
       // const pointerPosition = stage.getPointerPosition(); // Fix pointer position
       const layers = stage.getLayers(); 
@@ -163,6 +170,10 @@ const CanvasNode = ({ children }) => {
   };
   
   const handleMouseMove = (e) => {
+    if (isDrawing) {
+      setHasMoved(true);
+    }
+
     if (!selecting) return;
     e.evt.preventDefault();
   
@@ -188,6 +199,11 @@ const CanvasNode = ({ children }) => {
   };
   
   const handleMouseUp = (e) => {
+    setTimeout(() => {
+      setIsDrawing(false);
+      setHasMoved(false); 
+    }, 250);
+
     if (!selecting) return;
       setSelecting(false);
       selectionRectangle.visible(false); 
@@ -276,32 +292,65 @@ const CanvasNode = ({ children }) => {
     }
   };
 
-  const clearSelections = useCallback(
-    (e) => {
-      e.evt.preventDefault();
-      e.currentTarget.container?.().focus();
-      const prototype = Object.getPrototypeOf(e.target);
+  useEffect(() => {
+    if (isClick === true) {
+      if (!hasMoved && target) {
+        const prototype = Object.getPrototypeOf(target);
 
-      if (
-        (e.target.constructor.name === 'Image' || prototype?.className === "Image") &&
-        selectionsIds.length > 0 &&
-        e.target.attrs.id === 'FIE_original-image'
-      ) {
-        console.log('Clear Selection Canvas Successfully');
-        dispatch({
-          type: CLEAR_ANNOTATIONS_SELECTIONS,
-        });
+        if (
+          (target.constructor.name === 'Image' || prototype?.className === "Image") &&
+          selectionsIds.length > 0 &&
+          target.attrs.id === 'FIE_original-image'
+        ) {
+          console.log("Image", 'Clear Selection Canvas Successfully');
+          dispatch({
+            type: CLEAR_ANNOTATIONS_SELECTIONS,
+          });
+        }
       }
+      setIsClick(false);
+      setTarget(null);
+    }
+  }, [isDrawing, hasMoved, isClick, target]);
 
-      if (e.target.constructor.name === 'Stage' && selectionsIds.length > 0) {
-        console.log('Clear Selection Canvas Successfully');
-        dispatch({
-          type: CLEAR_ANNOTATIONS_SELECTIONS,
-        });
-      }
-    },
-    [selectionsIds],
-  );
+  const clearSelections = (e) => {
+    e.evt.preventDefault();
+    e.currentTarget.container?.().focus();
+    setIsClick(true);
+    setTarget(e.target);
+  }
+
+  // const clearSelections = useCallback(
+  //   (e) => {
+  //     e.evt.preventDefault();
+  //     e.currentTarget.container?.().focus();
+
+  //     const isDrawing = localStorage.getItem("isDrawing");
+  //     console.log(isDrawing);
+  //     if (!isDrawing) {
+  //       const prototype = Object.getPrototypeOf(e.target);
+
+  //       if (
+  //         (e.target.constructor.name === 'Image' || prototype?.className === "Image") &&
+  //         selectionsIds.length > 0 &&
+  //         e.target.attrs.id === 'FIE_original-image'
+  //       ) {
+  //         console.log("Image", 'Clear Selection Canvas Successfully');
+  //         dispatch({
+  //           type: CLEAR_ANNOTATIONS_SELECTIONS,
+  //         });
+  //       }
+
+  //       if (e.target.constructor.name === 'Stage' && selectionsIds.length > 0) {
+  //         console.log("Stage", 'Clear Selection Canvas Successfully');
+  //         dispatch({
+  //           type: CLEAR_ANNOTATIONS_SELECTIONS,
+  //         });
+  //       }
+  //     }
+  //   },
+  //   [selectionsIds],
+  // );
 
   const dragBoundFunc = (pos) => {
     const x = Math.min(0, Math.max(pos.x, canvasWidth * (1 - zoom.factor)));
@@ -361,9 +410,16 @@ const CanvasNode = ({ children }) => {
   };
 
   const revertKeyboardKeysEffect = (e) => {
-    if (e.code === 'Space') {
+    if (e.code === 'Space' || e.key === "Control") {
       e.preventDefault();
-      resetPanningAbility();
+      setIsPanningEnabled(false);
+
+      dispatch({
+        type: CHANGE_POINTER_ICON,
+        payload: {
+          pointerCssIcon: POINTER_ICONS['DRAG'],
+        },
+      });
     }
   };
 
@@ -381,6 +437,41 @@ const CanvasNode = ({ children }) => {
       },
     });
   }, [isPanningEnabled]);
+
+  useEffect(() => {
+    dispatch({
+      type: CHANGE_POINTER_ICON,
+      payload: {
+        pointerCssIcon: POINTER_ICONS['DRAW'],
+      },
+    });
+  }, [toolId]);
+
+  // useEffect(() => {
+  //   const annotationKeys = Object.keys(annotations);
+  //   if (annotationKeys.length > 0) {
+  //     const lastAnnotation = annotations[annotationKeys[annotationKeys.length - 1]];
+  //     if (lastAnnotation && lastAnnotation.name === "Text") {
+  //       dispatch({
+  //         type: ENABLE_TEXT_CONTENT_EDIT,
+  //         payload: {
+  //           textIdOfEditableContent: lastAnnotation.id,
+  //         },
+  //       });
+  //     }
+  //   }
+  // }, [annotations]);
+
+  // useEffect(() => {
+  //   if (toolId === "Polygon") {
+  //     dispatch({
+  //       type: CHANGE_POINTER_ICON,
+  //       payload: {
+  //         pointerCssIcon: POINTER_ICONS['DEFAULT'],
+  //       },
+  //     });
+  //   }
+  // }, [toolId, annotations, selectionsIds]);
 
   useEffect(() => {
     setIsPanningEnabled(
@@ -403,6 +494,7 @@ const CanvasNode = ({ children }) => {
         canvasContainer.removeEventListener('mouseenter', focusCanvasOnEnter);
         canvasContainer.removeEventListener('keydown', mapKeyboardKeys);
         canvasContainer.removeEventListener('keyup', revertKeyboardKeysEffect);
+        // canvasContainer.removeEventListener('click');
       }
     };
   }, [tabId, zoom.factor, defaultZoomFactor]);
@@ -437,7 +529,7 @@ const CanvasNode = ({ children }) => {
       dragBoundFunc={dragBoundFunc}
       draggable={isZoomEnabled && isPanningEnabled}
       onDragEnd={handleCanvasDragEnd}
-      style={cursorStyle}
+      style={{cursor: pointerCssIcon}}
     >
       {children}
     </StyledCanvasNode>

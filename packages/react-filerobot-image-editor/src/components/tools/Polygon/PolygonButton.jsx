@@ -10,7 +10,7 @@ import { TOOLS_IDS } from 'utils/constants';
 const PolygonButton = ({ selectTool, isSelected, t }) => (
   <ToolsBarItemButton
     className="FIE_polygon-tool-button"
-    id={TOOLS_IDS.SELECT}
+    id={TOOLS_IDS.POLYGON}
     label={"Select"}
     Icon={Resize}
     onClick={selectTool}

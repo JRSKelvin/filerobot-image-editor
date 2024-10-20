@@ -52,7 +52,6 @@ const activateTextChange = (
   // hide text node and transformer:
   textNode.hide();
   transformer.hide();
-
   const firstAnchor = transformer.children[0];
   const zoomLevel = canvasStage.scaleX();
 

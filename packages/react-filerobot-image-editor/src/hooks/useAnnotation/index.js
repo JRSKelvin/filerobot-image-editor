@@ -2,7 +2,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 /** Internal Dependencies */
-import { SELECT_ANNOTATION, SET_ANNOTATION } from 'actions';
+import { SELECT_ANNOTATION, SET_ANNOTATION, ENABLE_TEXT_CONTENT_EDIT } from 'actions';
 import randomId from 'utils/randomId';
 import debounce from 'utils/debounce';
 import { TOOLS_IDS } from 'utils/constants';
@@ -31,7 +31,8 @@ const useAnnotation = (annotation = {}, enablePreview = true) => {
   const annotationBeforeSelection = useRef();
   const canvas = previewGroup?.getStage();
 
-  const saveAnnotation = useCallback((annotationData) => {
+  const saveAnnotation = useCallback((annotationData, annotations) => {
+    const annotationKeys = Object.keys(annotations);
     const { fonts, onFontChange, ...savableAnnotationData } = annotationData;
     dispatch({
       type: SET_ANNOTATION,
@@ -46,6 +47,17 @@ const useAnnotation = (annotation = {}, enablePreview = true) => {
           },
         });
       }, 30)();
+    }
+
+    if (!annotationKeys.includes(savableAnnotationData.id)) {
+      setTimeout(() => {
+        dispatch({
+          type: ENABLE_TEXT_CONTENT_EDIT,
+          payload: {
+            textIdOfEditableContent: savableAnnotationData.id,
+          },
+        });
+      }, 250);
     }
   }, []);
 
@@ -122,9 +134,9 @@ const useAnnotation = (annotation = {}, enablePreview = true) => {
       saveAnnotation({
         ...savableAnnotation,
         id: shouldSave ? savableAnnotation.id : selection.id,
-      });
+      }, annotations);
     }
-  }, [tmpAnnotation]);
+  }, [tmpAnnotation, annotations]);
 
   useEffect(() => {
     // setTimeout to make the state changes after the annotation is drawn not before.
