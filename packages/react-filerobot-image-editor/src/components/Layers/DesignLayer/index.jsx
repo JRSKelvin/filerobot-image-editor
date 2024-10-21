@@ -6,7 +6,7 @@ import { Image, Layer } from 'react-konva';
 import getDimensionsMinimalRatio from 'utils/getDimensionsMinimalRatio';
 import cropImage from 'utils/cropImage';
 import { DESIGN_LAYER_ID, IMAGE_NODE_ID, TOOLS_IDS } from 'utils/constants';
-import { SET_SHOWN_IMAGE_DIMENSIONS } from 'actions';
+import { SET_ANNOTATION, SET_SHOWN_IMAGE_DIMENSIONS } from 'actions';
 import getProperImageToCanvasSpacing from 'utils/getProperImageToCanvasSpacing';
 import { useStore } from 'hooks';
 import getSizeAfterRotation from 'utils/getSizeAfterRotation';
@@ -265,7 +265,7 @@ const DesignLayer = () => {
       scaleY={finalScaleY}
       rotation={isCurrentlyCropping ? 0 : rotation}
       clipFunc={clipFunc}
-      onClick={(e) => {
+      onClick={async (e) => {
         const stage = e.target.getStage();
         const imageNode = imageNodeRef.current;
         const imagePos = imageNode.getClientRect();
@@ -277,7 +277,16 @@ const DesignLayer = () => {
         const onClickImagePositionFn = onClickImagePosition;
         // console.log(`X: ${percentageX}% And Y: ${percentageY}%`);
         if (typeof onClickImagePositionFn === 'function') {
-          onClickImagePositionFn(percentageX, percentageY);
+          const annotation = await onClickImagePositionFn(
+            percentageX,
+            percentageY,
+          );
+          if (annotation) {
+            dispatch({
+              type: SET_ANNOTATION,
+              payload: annotation,
+            });
+          }
         }
       }}
     >
