@@ -145,6 +145,12 @@ const activateTextChange = (
     }
   });
 
+  textarea.addEventListener('mouseleave', (event) => {
+    const textContent = textarea.value;
+    deactivateTextChange();
+    editFinishCallback(textContent);
+  });
+
   // textarea.addEventListener('keydown', (event) => {
   //   if (event.key === 'Enter' || event.key === 'Escape') {
   //     return;
