@@ -89,7 +89,7 @@ const AnnotationOptions = ({
 
   const changeAnnotationFill = useCallback(
     (newFill) => {
-      updateAnnotation({ fill: newFill });
+      updateAnnotation({ [className]: newFill, fill: newFill });
     },
     [updateAnnotation],
   );
@@ -117,9 +117,9 @@ const AnnotationOptions = ({
     >
       {!hideFillOption && (
         <ColorInput
-          color={annotation.fill}
+          color={annotation[className] || 'black'} // color={annotation.fill}
           onChange={changeAnnotationFill}
-          colorFor="fill"
+          colorFor={className} // colorFor="fill"
         />
       )}
 

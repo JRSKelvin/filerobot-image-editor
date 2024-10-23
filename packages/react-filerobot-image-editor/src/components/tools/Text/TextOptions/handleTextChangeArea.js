@@ -134,7 +134,7 @@ const activateTextChange = (
   textarea.addEventListener('keydown', (event) => {
     // hide on enter
     // but don't hide on shift + enter
-    if (event.key === 'Enter' && !event.shiftKey) {
+    if (event.key === 'Enter' && event.shiftKey) {
       const textContent = textarea.value;
       deactivateTextChange();
       editFinishCallback(textContent);
