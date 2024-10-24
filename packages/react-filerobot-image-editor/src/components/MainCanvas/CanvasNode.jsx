@@ -42,6 +42,7 @@ const CanvasNode = ({ children }) => {
     canvasWidth,
     canvasHeight,
     canvasScale,
+    textIdOfEditableContent,
     annotations = {},
     selectionsIds = [],
     zoom = {},
@@ -298,6 +299,12 @@ const CanvasNode = ({ children }) => {
         const prototype = Object.getPrototypeOf(target);
 
         if (
+          textIdOfEditableContent &&
+          selectionsIds.length === 1 &&
+          selectionsIds[0].startsWith('Text-')
+        ) {
+          console.log('Text', 'Text Editing');
+        } else if (
           (target.constructor.name === 'Image' || prototype?.className === "Image") &&
           selectionsIds.length > 0 &&
           target.attrs.id === 'FIE_original-image'

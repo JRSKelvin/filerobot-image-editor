@@ -35,10 +35,13 @@ const TextControls = ({ text, saveText, children }) => {
   const changeTextProps = useCallback(
     (e) => {
       const { name, value, type } = e.target;
-      saveText((latestText) => ({
-        id: latestText.id,
-        [name]: type === 'number' ? restrictNumber(value, 1, 500) : value,
-      }));
+      saveText((latestText) => {
+        // console.log('Text Area Update Text', name, value, type, textIdOfEditableContent, text, latestText);
+        return {
+          id: latestText.id,
+          [name]: type === 'number' ? restrictNumber(value, 1, 500) : value,
+        };
+      });
     },
     [saveText],
   );
