@@ -145,6 +145,11 @@ const activateTextChange = (
     }
   });
 
+  textarea.addEventListener('blur', function() {
+    // Set focus back to the textarea
+    textarea.focus();
+  });
+
   // textarea.addEventListener('mouseleave', (event) => {
   //   const textContent = textarea.value;
   //   deactivateTextChange();
