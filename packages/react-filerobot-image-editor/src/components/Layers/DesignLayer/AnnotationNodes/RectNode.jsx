@@ -56,7 +56,7 @@ const RectNode = ({
 
 RectNode.defaultProps = {
   ...nodesCommonPropTypes.defaults,
-  fill: '#000',
+  fill: '#00000000',
   cornerRadius: 0,
   width: 0,
   height: 0,

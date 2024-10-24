@@ -56,7 +56,7 @@ const EllipseNode = ({
 
 EllipseNode.defaultProps = {
   ...nodesCommonPropTypes.defaults,
-  fill: '#000',
+  fill: '#00000000',
   radiusX: 0,
   radiusY: 0,
 };

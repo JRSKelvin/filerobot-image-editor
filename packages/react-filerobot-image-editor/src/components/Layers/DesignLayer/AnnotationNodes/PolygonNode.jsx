@@ -56,7 +56,7 @@ const PolygonNode = ({
 
 PolygonNode.defaultProps = {
   ...nodesCommonPropTypes.defaults,
-  fill: '#000',
+  fill: '#00000000',
   sides: 3,
 };
 
