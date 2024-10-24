@@ -134,20 +134,53 @@ const AnnotationOptions = ({
       {children}
 
       <StyledOptionsWrapper>
-        {options.map(
-          (option) =>
-            option && (
-              <StyledIconWrapper
-                className="FIE_annotation-option-triggerer"
-                key={option.name}
-                title={t(option.titleKey)}
-                onClick={(e) => toggleOptionPopup(e, option.name)}
-                active={currentOption === option.name}
-              >
-                <option.Icon size={20} />
-              </StyledIconWrapper>
-            ),
+        {options
+          .filter((option) =>
+            ['Ellipse', 'Rect'].includes(annotation.name)
+              ? option?.titleKey === 'stroke'
+              : false,
+          )
+          .map(
+            (option) =>
+              option && (
+                <StyledIconWrapper
+                  className="FIE_annotation-option-triggerer"
+                  key={option.name}
+                  title={t(option.titleKey)}
+                  onClick={(e) => toggleOptionPopup(e, option.name)}
+                  active={currentOption === option.name}
+                >
+                  <option.Icon size={20} />
+                </StyledIconWrapper>
+              ),
+          )}
+        {!hideFillOption && (
+          <ColorInput
+            color={annotation[className] || 'black'} // color={annotation.fill}
+            onChange={changeAnnotationFill}
+            colorFor={className} // colorFor="fill"
+          />
         )}
+        {options
+          .filter((option) =>
+            ['Ellipse', 'Rect'].includes(annotation.name)
+              ? option?.titleKey !== 'stroke'
+              : true,
+          )
+          .map(
+            (option) =>
+              option && (
+                <StyledIconWrapper
+                  className="FIE_annotation-option-triggerer"
+                  key={option.name}
+                  title={t(option.titleKey)}
+                  onClick={(e) => toggleOptionPopup(e, option.name)}
+                  active={currentOption === option.name}
+                >
+                  <option.Icon size={20} />
+                </StyledIconWrapper>
+              ),
+          )}
       </StyledOptionsWrapper>
 
       {OptionPopupComponent && (
