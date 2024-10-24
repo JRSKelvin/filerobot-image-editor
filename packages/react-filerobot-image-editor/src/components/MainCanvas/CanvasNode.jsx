@@ -143,7 +143,7 @@ const CanvasNode = ({ children }) => {
     setIsDrawing(true);
     setHasMoved(false);
 
-    if (selectionRectangle && toolId === "Polygon") {
+    if (selectionRectangle && toolId === "Polygon" && e.evt?.ctrlKey === false) {
       const stage = e.target.getStage();
       // const pointerPosition = stage.getPointerPosition(); // Fix pointer position
       const layers = stage.getLayers(); 
