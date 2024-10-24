@@ -110,7 +110,9 @@ const activateTextChange = (
 
   textarea.style.transform = transform;
 
-  textarea.focus();
+  if (textarea) {
+    textarea.focus();
+  }
 
   function setTextareaWidth(newTextWidth) {
     let newWidth = newTextWidth;
@@ -147,7 +149,9 @@ const activateTextChange = (
 
   textarea.addEventListener('blur', function() {
     // Set focus back to the textarea
-    textarea.focus();
+    if (textarea) {
+      textarea.focus();
+    }
   });
 
   // textarea.addEventListener('mouseleave', (event) => {

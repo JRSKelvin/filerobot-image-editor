@@ -110,6 +110,14 @@ const AnnotationOptions = ({
     </>
   );
 
+  const getColor = () => {
+    if (className === "FIE_text-tool-options") {
+      return "black";
+    }
+
+    return "#00000000";
+  }
+
   return (
     <StyledOptions
       className={`FIE_annotations-options${className ? ` ${className}` : ''}`}
@@ -117,7 +125,7 @@ const AnnotationOptions = ({
     >
       {!hideFillOption && (
         <ColorInput
-          color={annotation[className] || 'black'} // color={annotation.fill}
+          color={annotation[className] || getColor()} // color={annotation.fill}
           onChange={changeAnnotationFill}
           colorFor={className} // colorFor="fill"
         />
