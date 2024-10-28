@@ -18,10 +18,14 @@ const useAnnotation = (annotation = {}, enablePreview = true) => {
     annotations,
     selectionsIds = [],
     config,
+    latestStrokeWidths,
   } = useStore();
   const annotationDefaults = {
     ...config.annotationsCommon,
     ...config[annotations[selectionsIds[0]]?.name || annotation.name],
+    ...(latestStrokeWidths?.default
+      ? { strokeWidth: latestStrokeWidths?.default }
+      : {}),
   };
   const [tmpAnnotation, setTmpAnnotation] = useState(() => ({
     ...annotationDefaults,
