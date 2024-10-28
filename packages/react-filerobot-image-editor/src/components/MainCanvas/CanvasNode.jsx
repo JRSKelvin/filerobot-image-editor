@@ -398,6 +398,38 @@ const CanvasNode = ({ children }) => {
     endTouchesZooming(resetPanningAbility);
   };
 
+  const mapMouseKeys = (e) => {
+    if (
+      e.button === 2 &&
+      !e.repeat &&
+      zoom.factor > defaultZoomFactor &&
+      isZoomEnabled
+    ) {
+      e.preventDefault();
+      setIsPanningEnabled(true);
+      dispatch({
+        type: CHANGE_POINTER_ICON,
+        payload: {
+          pointerCssIcon: POINTER_ICONS.DRAG,
+        },
+      });
+    }
+  };
+
+  const revertMouseKeysEffect = (e) => {
+    if (e.button === 2) {
+      e.preventDefault();
+      setIsPanningEnabled(false);
+
+      dispatch({
+        type: CHANGE_POINTER_ICON,
+        payload: {
+          pointerCssIcon: POINTER_ICONS['DRAG'],
+        },
+      });
+    }
+  };
+
   const mapKeyboardKeys = (e) => {
     if (
       (e.code === 'Space' || e.key === 'Control') &&
@@ -492,6 +524,8 @@ const CanvasNode = ({ children }) => {
     if (canvasRef.current) {
       canvasContainer = canvasRef.current.container();
       canvasContainer.addEventListener('mouseenter', focusCanvasOnEnter);
+      canvasContainer.addEventListener('mousedown', mapMouseKeys);
+      canvasContainer.addEventListener('mouseup', revertMouseKeysEffect);
       canvasContainer.addEventListener('keydown', mapKeyboardKeys);
       canvasContainer.addEventListener('keyup', revertKeyboardKeysEffect);
     }
@@ -499,6 +533,8 @@ const CanvasNode = ({ children }) => {
     return () => {
       if (canvasContainer) {
         canvasContainer.removeEventListener('mouseenter', focusCanvasOnEnter);
+        canvasContainer.addEventListener('mousedown', mapMouseKeys);
+        canvasContainer.addEventListener('mouseup', revertMouseKeysEffect);
         canvasContainer.removeEventListener('keydown', mapKeyboardKeys);
         canvasContainer.removeEventListener('keyup', revertKeyboardKeysEffect);
         // canvasContainer.removeEventListener('click');
