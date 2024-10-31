@@ -118,6 +118,8 @@ const AnnotationOptions = ({
     return "#00000000";
   }
 
+  const optionAnnotations = options.filter((option) => annotation.name === "Text" ? option.name !== "stroke" : true);
+
   return (
     <StyledOptions
       className={`FIE_annotations-options${className ? ` ${className}` : ''}`}
@@ -126,7 +128,7 @@ const AnnotationOptions = ({
       {children}
 
       <StyledOptionsWrapper>
-        {options
+        {optionAnnotations
           .filter((option) =>
             ['Ellipse', 'Rect'].includes(annotation.name)
               ? option?.titleKey === 'stroke'
@@ -153,7 +155,7 @@ const AnnotationOptions = ({
             colorFor={className} // colorFor="fill"
           />
         )}
-        {options
+        {optionAnnotations
           .filter((option) =>
             ['Ellipse', 'Rect'].includes(annotation.name)
               ? option?.titleKey !== 'stroke'

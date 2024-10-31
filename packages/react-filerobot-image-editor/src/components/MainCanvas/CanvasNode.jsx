@@ -524,8 +524,8 @@ const CanvasNode = ({ children }) => {
     if (canvasRef.current) {
       canvasContainer = canvasRef.current.container();
       canvasContainer.addEventListener('mouseenter', focusCanvasOnEnter);
-      canvasContainer.addEventListener('mousedown', mapMouseKeys);
-      canvasContainer.addEventListener('mouseup', revertMouseKeysEffect);
+      // canvasContainer.addEventListener('mousedown', mapMouseKeys);
+      // canvasContainer.addEventListener('mouseup', revertMouseKeysEffect);
       canvasContainer.addEventListener('keydown', mapKeyboardKeys);
       canvasContainer.addEventListener('keyup', revertKeyboardKeysEffect);
     }
@@ -533,8 +533,8 @@ const CanvasNode = ({ children }) => {
     return () => {
       if (canvasContainer) {
         canvasContainer.removeEventListener('mouseenter', focusCanvasOnEnter);
-        canvasContainer.addEventListener('mousedown', mapMouseKeys);
-        canvasContainer.addEventListener('mouseup', revertMouseKeysEffect);
+        // canvasContainer.addEventListener('mousedown', mapMouseKeys);
+        // canvasContainer.addEventListener('mouseup', revertMouseKeysEffect);
         canvasContainer.removeEventListener('keydown', mapKeyboardKeys);
         canvasContainer.removeEventListener('keyup', revertKeyboardKeysEffect);
         // canvasContainer.removeEventListener('click');

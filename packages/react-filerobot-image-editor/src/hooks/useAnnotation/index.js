@@ -31,7 +31,9 @@ const useAnnotation = (annotation = {}, enablePreview = true) => {
     ...annotationDefaults,
     ...annotation,
     ...annotations[selectionsIds[0]],
+    strokeWidth: annotation?.name === "Text" ? 0 : annotationDefaults.strokeWidth
   }));
+  
   const annotationBeforeSelection = useRef();
   const canvas = previewGroup?.getStage();
 
