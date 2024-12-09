@@ -73,7 +73,7 @@ const useAnnotation = (annotation = {}, enablePreview = true) => {
               textIdOfEditableContent: savableAnnotationData.id,
             },
           });
-        }, 60)();
+        }, 100)();
         // setTimeout(() => {
         // }, 250);
       }
