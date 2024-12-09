@@ -4,8 +4,21 @@ let transformer;
 let editFinishCallback;
 let disableTextEditCallback;
 
-const handleOutsideClick = (e) => {
-  if (e.target !== textarea) {
+let isDragging = false; // Tracks dragging
+let clickHoldTimer = null; // Timer for click-and-hold detection
+let startX, startY; // Initial pointer position
+
+export const handleOutsideClick2 = () => {
+  if (textarea?.value) {
+    const textValue = textarea.value;
+    // eslint-disable-next-line no-use-before-define
+    deactivateTextChange();
+    editFinishCallback(textValue, true);
+  }
+}
+
+export const handleOutsideClick = (e) => {
+  if (e?.target !== textarea) {
     const textValue = textarea.value;
     // eslint-disable-next-line no-use-before-define
     deactivateTextChange();
@@ -170,9 +183,49 @@ const activateTextChange = (
   //   textarea.style.height = `${textarea.scrollHeight + textNode.fontSize()}px`;
   // });
 
+  function handleMouseDown(event) {
+    // Reset states
+    isDragging = false;
+  
+    // Record initial pointer position
+    startX = event.clientX;
+    startY = event.clientY;
+  
+    // Start a timer for detecting click-and-hold
+    clickHoldTimer = setTimeout(() => {
+      console.log('Debug Click-and-hold detected');
+    }, 500); // 500ms for click-and-hold detection
+  
+    // Add mousemove listener for dragging
+    window.addEventListener('mousemove', handleMouseMove);
+  }
+  
+  function handleMouseMove(event) {
+    const deltaX = Math.abs(event.clientX - startX);
+    const deltaY = Math.abs(event.clientY - startY);
+  
+    // If movement exceeds a threshold, mark as dragging
+    if (deltaX > 5 || deltaY > 5) {
+      isDragging = true;
+  
+      // Cancel the click-and-hold timer (dragging invalidates click-and-hold)
+      clearTimeout(clickHoldTimer);
+  
+      handleOutsideClick2();
+    }
+  }
+  
+  function handleMouseUp(event) {
+    // Cleanup
+    window.removeEventListener('mousemove', handleMouseMove);
+    clearTimeout(clickHoldTimer);
+  }
+
   if (window) {
     setTimeout(() => {
       window.addEventListener('click', handleOutsideClick);
+      window.addEventListener('mousedown', handleMouseDown);
+      window.addEventListener('mouseup', handleMouseUp);
     });
   }
 };

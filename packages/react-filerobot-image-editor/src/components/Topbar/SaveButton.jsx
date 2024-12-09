@@ -282,7 +282,7 @@ const SaveButton = () => {
       {isModalOpened && (
         <Modal
           className="FIE_save-modal"
-          title={t('saveAsModalTitle')}
+          title={"Are you sure want to save ?"}
           // eslint-disable-next-line react/no-unstable-nested-components
           Icon={(props) => (
             <Image2 color={theme.palette['accent-primary']} {...props} />
@@ -296,7 +296,7 @@ const SaveButton = () => {
           areButtonsDisabled={isLoadingGlobally}
           zIndex={11110}
         >
-          <StyledFileNameInput
+          {/* <StyledFileNameInput
             className="FIE_save-file-name-input"
             value={imageFileInfo.name}
             onChange={changeFileName}
@@ -347,7 +347,7 @@ const SaveButton = () => {
               alignLeft
               alignment="space-between"
             />
-          </StyledResizeOnSave>
+          </StyledResizeOnSave> */}
         </Modal>
       )}
     </>

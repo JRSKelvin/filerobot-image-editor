@@ -47,12 +47,17 @@ const previewThenCallAnnotationAdding = (
   };
 
   const previewAnnotation = (preparedAnnotation) => {
+    // if (preparedAnnotation.name === TOOLS_IDS.TEXT) {
+    //   handleOutsideClick2();
+    // } 
+
     shownAnnotationPreview = getNewAnnotationPreview(preparedAnnotation);
     previewGroup.add(shownAnnotationPreview);
     if (preparedAnnotation.name === TOOLS_IDS.TEXT) {
       wrapTextBoundsPreviewByRect(preparedAnnotation);
     }
     latestAnnotationProps = preparedAnnotation;
+
   };
 
   const updateAnnotationPreview = (preparedBoundingRect, isShiftKeyPressed) => {

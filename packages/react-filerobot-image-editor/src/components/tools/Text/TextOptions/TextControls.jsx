@@ -1,5 +1,5 @@
 /** External Dependencies */
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import MenuItem from '@scaleflex/ui/core/menu-item';
 import FontBold from '@scaleflex/icons/font-bold';
@@ -9,7 +9,7 @@ import FontItalic from '@scaleflex/icons/font-italic';
 import { TOOLS_IDS, TRANSFORMERS_LAYER_ID } from 'utils/constants';
 import AnnotationOptions from 'components/common/AnnotationOptions';
 import { StyledIconWrapper } from 'components/common/AnnotationOptions/AnnotationOptions.styled';
-import { ENABLE_TEXT_CONTENT_EDIT } from 'actions';
+import { ENABLE_TEXT_CONTENT_EDIT, SET_ANNOTATION } from 'actions';
 import restrictNumber from 'utils/restrictNumber';
 import { useStore } from 'hooks';
 import {
@@ -27,8 +27,10 @@ import {
 } from './handleTextChangeArea';
 
 const TextControls = ({ text, saveText, children }) => {
-  const { dispatch, textIdOfEditableContent, designLayer, t, config } =
+  const [textContent, setTextContent] = useState();
+  const { dispatch, textIdOfEditableContent, designLayer, t, config, annotations, selectionsIds } =
     useStore();
+
   const { useCloudimage } = config;
   const { fonts = [], onFontChange } = config[TOOLS_IDS.TEXT];
 
@@ -40,6 +42,7 @@ const TextControls = ({ text, saveText, children }) => {
         return {
           id: latestText.id,
           [name]: type === 'number' ? restrictNumber(value, 1, 500) : value,
+          isNotSelect: e.target.isNotSelect
         };
       });
     },
@@ -90,14 +93,23 @@ const TextControls = ({ text, saveText, children }) => {
     });
   }, []);
 
-  const changeTextContent = useCallback((newContent) => {
-    changeTextProps({
-      target: {
+  const changeTextContent = useCallback((newContent, isNotSelect) => {
+    if (isNotSelect) {
+      setTextContent({
         name: 'text',
         value: newContent,
-      },
-    });
-    disableTextEdit();
+        isNotSelect,
+      })
+    } else {
+      changeTextProps({
+        target: {
+          name: 'text',
+          value: newContent,
+          isNotSelect,
+        },
+      });
+      disableTextEdit();
+    }
   }, []);
 
   useEffect(() => {
@@ -118,6 +130,23 @@ const TextControls = ({ text, saveText, children }) => {
       if (transformer && textIdOfEditableContent) deactivateTextChange();
     };
   }, [textIdOfEditableContent]);
+
+  useEffect(() => {
+    if (textContent?.isNotSelect) {
+      console.log("DEBUG", annotations, selectionsIds)
+      if (selectionsIds?.length > 0 && annotations) {
+        const targetAnnotate = annotations[selectionsIds[0]];
+        if (targetAnnotate) {
+          targetAnnotate.text = textContent.value;
+          console.log("DEBUG", targetAnnotate);
+          dispatch({
+            type: SET_ANNOTATION,
+            payload: targetAnnotate,
+          });
+        }
+      }
+    }
+  }, [textContent, annotations, selectionsIds]);
 
   return (
     <AnnotationOptions

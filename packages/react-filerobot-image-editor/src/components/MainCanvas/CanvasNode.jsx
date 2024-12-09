@@ -439,12 +439,12 @@ const CanvasNode = ({ children }) => {
     ) {
       e.preventDefault();
       setIsPanningEnabled(true);
-      dispatch({
-        type: CHANGE_POINTER_ICON,
-        payload: {
-          pointerCssIcon: POINTER_ICONS.DRAG,
-        },
-      });
+      // dispatch({
+      //   type: CHANGE_POINTER_ICON,
+      //   payload: {
+      //     pointerCssIcon: POINTER_ICONS.DRAG,
+      //   },
+      // });
     }
   };
 
@@ -453,12 +453,12 @@ const CanvasNode = ({ children }) => {
       e.preventDefault();
       setIsPanningEnabled(false);
 
-      dispatch({
-        type: CHANGE_POINTER_ICON,
-        payload: {
-          pointerCssIcon: POINTER_ICONS['DRAG'],
-        },
-      });
+      // dispatch({
+      //   type: CHANGE_POINTER_ICON,
+      //   payload: {
+      //     pointerCssIcon: POINTER_ICONS['DRAG'],
+      //   },
+      // });
     }
   };
 

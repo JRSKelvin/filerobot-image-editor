@@ -9,6 +9,7 @@ import { TOOLS_IDS } from 'utils/constants';
 import { useStore } from 'hooks';
 import previewThenCallAnnotationAdding from './previewThenCallAnnotationAdding';
 import useDebouncedCallback from '../useDebouncedCallback';
+import { handleOutsideClick2 } from "../../components/tools/Text/TextOptions/handleTextChangeArea";
 
 // TODO: Imporve the logic and separate the selected annotation options from handling preview and options before draw.
 const useAnnotation = (annotation = {}, enablePreview = true) => {
@@ -38,32 +39,44 @@ const useAnnotation = (annotation = {}, enablePreview = true) => {
   const canvas = previewGroup?.getStage();
 
   const saveAnnotation = useCallback((annotationData, annotations) => {
-    const annotationKeys = Object.keys(annotations);
-    const { fonts, onFontChange, ...savableAnnotationData } = annotationData;
-    dispatch({
-      type: SET_ANNOTATION,
-      payload: savableAnnotationData,
-    });
-    if (savableAnnotationData.id && annotation.name !== TOOLS_IDS.PEN) {
-      debounce(() => {
-        dispatch({
-          type: SELECT_ANNOTATION,
-          payload: {
-            annotationId: savableAnnotationData.id,
-          },
-        });
-      }, 30)();
-    }
+    if (annotationData?.isNotSelect) {
+      const { ...savableAnnotationData } = annotationData;
+      dispatch({
+        type: SET_ANNOTATION,
+        payload: savableAnnotationData,
+      });
+    } else {
+      const annotationKeys = Object.keys(annotations);
+      const { fonts, onFontChange, ...savableAnnotationData } = annotationData;
 
-    if (!annotationKeys.includes(savableAnnotationData.id) && savableAnnotationData.name === "Text") {
-      setTimeout(() => {
-        dispatch({
-          type: ENABLE_TEXT_CONTENT_EDIT,
-          payload: {
-            textIdOfEditableContent: savableAnnotationData.id,
-          },
-        });
-      }, 250);
+      dispatch({
+        type: SET_ANNOTATION,
+        payload: savableAnnotationData,
+      });
+  
+      if (savableAnnotationData.id && annotation.name !== TOOLS_IDS.PEN) {
+        debounce(() => {
+          dispatch({
+            type: SELECT_ANNOTATION,
+            payload: {
+              annotationId: savableAnnotationData.id,
+            },
+          });
+        }, 30)();
+      }
+  
+      if (!annotationKeys.includes(savableAnnotationData.id) && savableAnnotationData.name === "Text") {
+        debounce(() => {
+          dispatch({
+            type: ENABLE_TEXT_CONTENT_EDIT,
+            payload: {
+              textIdOfEditableContent: savableAnnotationData.id,
+            },
+          });
+        }, 60)();
+        // setTimeout(() => {
+        // }, 250);
+      }
     }
   }, []);
 
@@ -179,17 +192,25 @@ const useAnnotation = (annotation = {}, enablePreview = true) => {
     let stopAnnotationEventsListening = null;
 
     if (canvas && enablePreview) {
-      const annotationInitialProps = getAnnotationInitialProps(
-        tmpAnnotation,
-        annotation.name,
-      );
-
-      stopAnnotationEventsListening = previewThenCallAnnotationAdding(
-        canvas,
-        { ...annotationInitialProps, name: annotation.name },
-        previewGroup,
-        saveAnnotationNoDebounce,
-      );
+      if (tmpAnnotation.isNotSelect) {
+        //  stopAnnotationEventsListening = previewThenCallAnnotationAdding(
+        //   canvas,
+        //   { ...tmpAnnotation, name: annotation.name },
+        //   previewGroup,
+        //   saveAnnotationNoDebounce,
+        // );
+      } else {
+        const annotationInitialProps = getAnnotationInitialProps(
+          tmpAnnotation,
+          annotation.name,
+        );
+         stopAnnotationEventsListening = previewThenCallAnnotationAdding(
+          canvas,
+          { ...annotationInitialProps, name: annotation.name },
+          previewGroup,
+          saveAnnotationNoDebounce,
+        );
+      }
     }
 
     return () => {
